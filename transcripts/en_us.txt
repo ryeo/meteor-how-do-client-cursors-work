@@ -1,0 +1,109 @@
+When you call the "find" method on a collection it returns something called a
+"cursor." In the previous two screencasts we looked at the observe method of
+cursor. In this screencast I'd like to get a better sense of what a cursor
+actually is and how the other methods of cursor work.
+
+Before we look at a cursor, let's look at the collection we'll be working with.
+I've called it DocumentCollection, and if I call find followed by fetch we can
+take a look at the documents.
+
+I've seeded the collection with three documents and each one has a text
+property, isVisible property and an order property.
+
+Now that we've seen the documents we'll be querying, let's create our first
+cursor. To do that we'll call the "find" method on the collection. To start, I
+won't use any selector so we can just get a feel for the cursor object.
+
+Let's expand the cursor and look inside. The first thing to notice is a property
+called "db_objects." It's currently set to null. This is because we haven't
+actually executed the query yet. The second thing to notice is that the cursor
+stores a reference to the collection itself. And if we dig into it we can see
+the three documents are the same ones from above. If I expand the first document
+we can see it's the same as the first document in the array I got from calling
+the fetch method above.
+
+Now let's call the fetch method on *this* cursor. You can see I get back the
+same array of three objects. And if we look inside the cursor now we can see the
+db_objects property now points to an array with three elements and the cursor
+position is set to three indicating that the cursor has iterated over the result
+set.
+
+If we expand the db_objects property we can see it has the same objects as the
+ones we got from calling the fetch method on the cursor, and are also the same
+as the original array of documents above.
+
+So we're seeing a couple things here. First, a cursor is just a way to store
+some information about a query. Second, the query doesn't actually execute until
+we call one of the iteration methods like fetch, forEach or map on the cursor.
+In other words, the cursor is "lazy." Finally, once the query has executed, the
+results are stored in the db_objects array. In other words, the results are
+"cached." So if we call fetch, forEach or map again, we'll be iterating over the
+cached results and not executing the query again.
+
+Now let's create a cursor with a selector. We only want to find the documents
+whose isVisible property is true. If you remember, we have two of those
+documents. Inside the cursor we can see our selector has been compiled into a
+function and assigned to the selector_f property. The function takes a document
+as input and returns true if the document's isVisible property is true, and it
+returns false if the document's isVisible property is false. Now, we can see
+that our cursor position is still zero and the db_objects property is null
+because we haven't actually executed the query yet.
+
+Let's do that now by calling the fetch method. You can see the two visible
+documents are returned.
+
+And if we look inside the cursor again we can see the db_objects property has
+been assigned to the result set, and the cursor position is at two.
+
+Now, the thing to note here is that the original collection still has three
+documents. But our result set only has two documents. And that's because the
+cursor looked at the original collection and used its selector function to
+decide whether each document should be in the result set for this cursor based
+on the selector.
+
+Next, we'll create a sorted cursor. We'll call the find method again, this time
+with no selector. But in the second parameter we'll say we want to sort by the
+order field and specify 1 to indicate we want the results sorted in ascending
+order. This time we can see the cursor's selector function always returns true
+because we passed in an empty selector object, but our sort object has been
+compiled into a function that takes two documents as parameters and compares
+them to see which one should come first. If I call fetch I can see the result
+set is ordered by the order field.
+
+Next, let's create a cursor that skips some documents by using the skip
+modifier. Once again I'll pass an empty selector, but in the second parameter
+I'll say I want to skip the first two results. Inside the cursor I can see the
+skip property is set to two and just like before the selector function always
+returns true. If I call fetch on the cursor I only get one document back because
+the first two were skipped.
+
+One last modifier. In this cursor we'll limit the result set to one document by
+using the limit modifier. Inside the cursor I can see the limit property is set
+to one. And if I call fetch the result set only has one document.
+
+And of course, I can combine a selector object with sort, skip and limit
+modifiers. So in this cursor I'll select documents whose isVisible property is
+true, I'll limit the result set to two documents and I'll sort them by the order
+field. In the cursor I can see my limit is set to two, the sort function
+corresponds to my sort object and the selector function corresponds to my
+selector object.
+
+If I call fetch I can see two results sorted by the order field.
+
+Before we conclude, let's look at the count and forEach methods. As we might
+expect, if we call the count method we get the number of documents in our result
+set. The forEach method takes a function as a parameter, and will call that
+function for each document in the result set. So in this case, I'll just print
+the document's text field to the console. Hmmm, nothing seemed to happen here.
+Why is that?
+
+Well, if we loo at the cursor position property we can see it's set to two
+because we've already iterated over the result set. So what we need to do is
+rewind the position before we call the forEach method. I'll do that by calling
+the rewind method. Then I'll try my forEach method again, and this time, we see
+the document text fields printed to the console.
+
+To conclude, first remember that cursors are a way of controlling a query and the
+iteration over that queries results. Second, the cursor's query doesn't execute
+until one of its iteration methods is called, like the fetch, forEach, map or
+count methods.

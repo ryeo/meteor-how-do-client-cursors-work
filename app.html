@@ -1,0 +1,19 @@
+<head>
+  <title>Cursors</title>
+</head>
+
+<body>
+{{> documentList}}
+</body>
+
+<template name="documentList">
+  <ul>
+    {{#each documents}}
+      {{> documentItem}}  
+    {{/each}}
+  </ul>
+</template>
+
+<template name="documentItem">
+  <li>{{text}}</li>
+</template>
